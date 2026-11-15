@@ -35,8 +35,7 @@ available; host and task instructions determine when it applies.
 
 `commit-message` uses `reader-oriented-explanation` and separately available
 `clear-writing`. `skill-authorship` uses `model-refinement` for conceptual changes.
-Install the seven together to cover these compositions. Other references can
-acknowledge applicable policy without requiring automatic skill activation.
+Installing all seven covers these dependencies.
 
 See the official [Codex](https://learn.chatgpt.com/docs/build-skills),
 [Claude Code](https://code.claude.com/docs/en/skills), and
@@ -51,8 +50,7 @@ changes separately and export reviewed releases; public contributions follow
 [CONTRIBUTING.md](CONTRIBUTING.md). Supporting design explanations are under
 `docs/<package>/DESIGN.md`.
 
-A package's source URL describes provenance, not permission to publish task data.
-Before opening a public issue, remove private context and use a public-safe
-reproduction. For private tasks, follow the host or task's authorized reporting
-route. If no safe private route exists, retain a local draft rather than posting
-private details publicly.
+Public issues and pull requests are for public-safe reports and proposed changes;
+the contribution guide explains the disclosure limits and release process.
+Instructions for agents using or working on this repository are in
+[AGENTS.md](AGENTS.md).
