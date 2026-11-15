@@ -16,6 +16,29 @@ behavioral report should identify its exact runtime bytes, dependencies, host an
 model conditions, task protocol, outcomes, failures, and uncertainty. Private
 supporting evidence must not be cited as though a public reader can inspect it.
 
+## Maintainer-reported discovery check
+
+The initial [public release](https://github.com/joshlf/skills/commit/6a63da89d7240b1083e56991ab3718fbe7862ae7)
+was checked on fresh GitHub-hosted Linux and macOS 15 runners with only its
+proposed public files supplied to the discovery jobs. All seven packages were
+found in each of these six host/platform cases:
+
+| Host | Version | Discovery operation |
+| --- | --- | --- |
+| Codex | 0.169.0 | App-server `skills/list` |
+| Claude Code | 2.1.325 | SDK initialization command listing |
+| Gemini CLI | 0.68.0 | `skills list` |
+
+The tested snapshot's complete path/byte/mode inventory has SHA-256
+`79e5fc738cd04ae51e8b6f14340360791821f7008555ca948d0758fcbf242151`.
+These are maintainer-reported observations; the raw host-run logs are not
+included here. No model turn was sent, and authenticated invocation checks were
+deferred. The result establishes discovery in those conditions, not automatic
+activation, instruction following or comparative effectiveness. It does not
+silently apply to later changed files or host versions.
+
+## Reproduce discovery
+
 The [native discovery probe](../tests/probe_hosts.py) can be run from a clean
 installation with the official `codex`, `claude`, and `gemini` executables on
 PATH. It creates a temporary project, copies the complete packages, and uses
@@ -36,5 +59,3 @@ Host discovery and explicit invocation must be verified in the user's actual
 installation. Documentation of an installation path is not an executed host test.
 The private release review records which environments were actually exercised;
 unverified combinations remain unverified.
-
-*Authored by an AI agent acting on joshlf's behalf.*

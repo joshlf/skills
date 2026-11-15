@@ -33,3 +33,7 @@ verification, and tool authorization is an agent-specific design choice, not a
 claim that Williams supplied these exact instructions. This is not a scholarly
 reconstruction of the entire book; a full-text edition-by-edition verification
 has not been performed. The skill requires no runtime access to these sources.
+
+These sources explain the design's intellectual basis; they are not evaluations
+of this skill. Finding the package in a host's skill listing likewise does not
+establish that it improves writing or that an agent follows its instructions.

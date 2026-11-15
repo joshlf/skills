@@ -31,5 +31,3 @@ candidate that removes its own obligations.
 
 The [runtime instructions](../../model-refinement/SKILL.md) govern execution.
 See [evidence and limits](../EVIDENCE.md) for the scope of public validation.
-
-*Authored by an AI agent acting on joshlf's behalf.*

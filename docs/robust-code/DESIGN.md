@@ -28,5 +28,3 @@ encourages abstractions whose cost exceeds the preserved benefit.
 
 The [runtime instructions](../../robust-code/SKILL.md) govern execution.
 See [evidence and limits](../EVIDENCE.md) for the scope of public validation.
-
-*Authored by an AI agent acting on joshlf's behalf.*
