@@ -29,5 +29,3 @@ essays would justify revisiting the boundaries or examples.
 
 The [runtime instructions](../../commit-message/SKILL.md) govern execution.
 See [evidence and limits](../EVIDENCE.md) for the scope of public validation.
-
-*Authored by an AI agent acting on joshlf's behalf.*

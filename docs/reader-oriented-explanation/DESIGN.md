@@ -30,5 +30,3 @@ rewarding a preferred sentence form.
 
 The [runtime instructions](../../reader-oriented-explanation/SKILL.md) govern execution.
 See [evidence and limits](../EVIDENCE.md) for the scope of public validation.
-
-*Authored by an AI agent acting on joshlf's behalf.*

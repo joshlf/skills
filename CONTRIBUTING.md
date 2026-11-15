@@ -16,5 +16,3 @@ Proposed scripts and workflows are treated as untrusted code. They are not run
 with publication credentials or private fixtures. Public tests use public inputs;
 passing them does not approve disclosure or establish behavioral effectiveness.
 Include applicable attribution and identify material AI-authored contributions.
-
-*Authored by an AI agent acting on joshlf's behalf.*

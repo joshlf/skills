@@ -56,5 +56,3 @@ Before opening a public issue, remove private context and use a public-safe
 reproduction. For private tasks, follow the host or task's authorized reporting
 route. If no safe private route exists, retain a local draft rather than posting
 private details publicly.
-
-*Authored by an AI agent acting on joshlf's behalf.*

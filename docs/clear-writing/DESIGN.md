@@ -29,5 +29,3 @@ original task’s commitments, not merely produce shorter prose.
 
 The [runtime instructions](../../clear-writing/SKILL.md) govern execution.
 See [evidence and limits](../EVIDENCE.md) for the scope of public validation.
-
-*Authored by an AI agent acting on joshlf's behalf.*
