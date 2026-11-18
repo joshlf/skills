@@ -1,4 +1,4 @@
-"""Exact captured bytes and trusted SQLite image checks shared by both readers."""
+"""Exact captured bytes and trusted SQLite image checks."""
 
 from __future__ import annotations
 

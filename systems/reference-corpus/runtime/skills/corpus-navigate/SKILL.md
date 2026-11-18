@@ -16,17 +16,19 @@ preserve qualifications and unresolved coverage.
 ## Bind the operation
 
 Obtain the caller's project binding and scope before tool use. Load the complete
-CLI contract for its explicit interpretation, relative to this skill's directory:
-
-- `reference/1`: [corpus-nav](references/cli.md).
+CLI contract for `reference-corpus/1`, relative to this skill's directory:
+[corpus-nav](references/cli.md). This release supports one common report format.
 
 The binding selects an absolute executable and either an exact completed
 `IndexRef` or explicit source/build inputs, the supported interpretation, required
-native context identities, private cache and allowed operation. Build also needs
-the bound native policy and report requirements. Search/list/read of captured
-content needs the completed index and task authority; it does not require a live
+context identities, private cache and allowed operation. Build selects exact
+hashes for `AGENTS.md`, the complete common `FORMAT.md`, and `CORPUS.json`.
+Search/list/read of captured content needs the completed index and task
+authority; it does not require a live
 repository, current report template or hint service. Do not send one executable's
-request schema to another or infer a reader from file proximity.
+request schema to another or infer a reader from file proximity. Historical
+indexes require their independently selected qualified reader; this release
+does not choose or install one, rewrite images, or translate saved handles.
 
 Do not guess bindings from cwd, filename proximity, installed siblings or the
 newest index. Missing/conflicting resources or unsupported interpretations block
@@ -50,11 +52,11 @@ catalog and pinned source under the corpus's own guidance and label that route.
 2. Break the question into distinct obligations or facets. Search precise
    symbols and native identities, then useful paraphrases where needed. Use hard
    filters only when the task requires them and the selected API supports them.
-   Reference/1 contextual target subjects annotate recorded matches. Topics, source membership
+   Contextual target subjects annotate recorded matches. Topics, source membership
    and matches establish neither applicability nor truth.
 3. Read the original scope, evidence and uncertainty relevant to promising
-   documents. Reference/1 supplies Summary, Applicability and Boundaries before
-   the relevant Findings, Evidence or Revalidation.
+   documents. Read Summary, Applicability and Boundaries before the relevant
+   Findings, Evidence or Revalidation.
    Use inventory for captured files that no query matched. Verify complete handle
    relationships by passing them to `read`; a plausible path is insufficient.
    Quote only original returned bytes with exact handles. A source-range handle

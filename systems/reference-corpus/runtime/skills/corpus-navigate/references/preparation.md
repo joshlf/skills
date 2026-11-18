@@ -7,7 +7,8 @@ complete [CLI contract](cli.md) before using its records. This reference belongs
 to the same installed package; it needs no development checkout or model service.
 
 The initial recipe consumes one package's captured `REPORT.json`, `REPORT.md`
-and captured `FORMAT.md` context. The binding records the exact recipe digest and
+and captured `AGENTS.md`, `FORMAT.md` and `CORPUS.json` context. The binding records
+the exact recipe digest and
 the complete preparation instructions/schema it selects. Use that same digest
 in planning, cards and build selections. A hash does not establish that arbitrary
 replacement guidance has the same requirements. A different input shape needs an
@@ -24,7 +25,7 @@ per package:
 - `needs_selection`: one or more usable completed candidates exist, including a
   single unselected candidate. Choose explicitly under the task's authority.
 - `needs_preparation`: no usable candidate exists; the inline `JobSpec` identifies
-  the exact generation, fingerprint, recipe, three input identities and current
+  the exact generation, fingerprint, recipe, five input identities and current
   destination.
 
 A rejected explicit selection remains visible alongside the applicable state.
@@ -51,10 +52,10 @@ available reported identity, or `unknown` when unavailable.
 
 Every entry has nonempty routing text and nonempty source anchors. Anchors must
 refer to this package's `REPORT.json` or `REPORT.md` inputs, with exact file hash
-and valid UTF-8 byte ranges. `FORMAT.md` supplies context and is not a report
-anchor. Source fingerprints bind corpus ID, package path/tree and governing
+and valid UTF-8 byte ranges. The three governing resources supply context and are
+not report anchors. Source fingerprints bind corpus ID, package path/tree and governing
 contract blobs; a support-only or contract change can invalidate a card even
-though this recipe reads only three files.
+though this recipe reads only its five declared inputs.
 
 When writing is authorized, create a unique temporary file under
 `<cards-root>/<source-fingerprint>/<recipe-sha256>/`. Close and validate it,

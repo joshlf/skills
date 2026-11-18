@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corpus-nav"
-version = "0.1.0"
-description = "Immutable source navigation for reference corpora"
+dynamic = ["version"]
+description = "Immutable source navigation for reference report corpora"
 requires-python = ">=3.11"
 dependencies = ["markdown-it-py==4.0.0"]
 
@@ -14,3 +14,6 @@ corpus-nav = "corpus_nav.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "corpus_nav.__version__"}

@@ -89,6 +89,16 @@ of mutable output directories. Cards created after an earlier page do not
 rewrite that page's observation; a fresh scan can revisit it. Build revalidates
 every actual selected card before use. This needs no cursor/inventory service.
 
+Current images use `corpus-nav-index/2` and contain the exact selected
+interpretation resources. Their resource hashes enter build and recipe identities
+and every returned context as `format:FormatSelection`. Reads validate report
+topics against the captured machine policy, independent of current source or
+installed skills. Unsupported manifest versions return `unsupported_format`;
+malformed images return `index_mismatch`. Callers must select their qualified
+historical reader explicitly. This executable never
+chooses a fallback reader, alters an image or replaces a saved handle. A new
+index has its own identity and cannot satisfy a handle for another image.
+
 ## Closed request variants
 
 Requests are at most 1 MiB of UTF-8 before decoding. All contain their exact
@@ -99,11 +109,18 @@ Requests are at most 1 MiB of UTF-8 before decoding. All contain their exact
 | Operation/schema | Other fields and defaults |
 | --- | --- |
 | `doctor` / `corpus-nav-doctor/1` | `repository?: AbsPath`, `cache?: AbsPath`, `max_bytes?`. Check runtime/FTS always; Git controls only with repository; filesystem publication only with cache. Missing inputs yield `not_examined`, not pass. Cache probes use a fresh synthetic subdirectory and retain its last-known path as residue; no corpus mutation. |
-| `build` / `corpus-nav-build/1` | Required `build_id` (32 lowercase hex digits, caller supplied), `corpus_id` (nonempty), `repository: AbsPath`, `ref` (nonempty local ref/commit), `corpus_path` (relative structural path or `.`), `format:{reader:"reference/1",sha256:Hash}`, `cache:AbsPath`. Optional `recipe:"source-only/1"|"hinted/1"` defaults source-only; `settings`, `card_selections:CardSelection[]` default empty; `max_bytes?`. No continuation. |
+| `build` / `corpus-nav-build/1` | Required `build_id` (32 lowercase hex digits, caller supplied), `corpus_id` (nonempty), `repository: AbsPath`, `ref` (nonempty local ref/commit), `corpus_path` (relative structural path or `.`), `format:FormatSelection`, `cache:AbsPath`. Optional `recipe:"source-only/1"|"hinted/1"` defaults source-only; `settings`, `card_selections:CardSelection[]` default empty; `max_bytes?`. No continuation. |
 | `search` / `corpus-nav-search/1` | Required `index:IndexRef`. Optional `query:string`, `filters:Filters`, `target_subjects:Selector[]` (default empty, annotations only), `bounds:Bounds`, `limit?`, `max_bytes?`, `continuation?`. |
 | `list` / `corpus-nav-list/1` | Required `index:IndexRef`. Optional `items:"reports"|"admissions"|"sources"` defaults reports, `package?:string` (sources only), `filters:Filters`, `limit?`, `max_bytes?`, `continuation?`. Only reports accepts nonempty filters; admissions enumerates package/card records, sources enumerates captured and manifest-only entries. |
 | `read` / `corpus-nav-read/1` | Required `index:IndexRef`, `select:ReadSelection`. Optional `max_bytes?`, `continuation?`. |
 | `prepare` / `corpus-nav-prepare/1` | Required `index:IndexRef`, `recipe_sha256:Hash`, `cards_directory:AbsPath`. Optional `packages:string[]` defaults all, `selected_cards:CardSelection[]` defaults empty, `limit?`, `max_bytes?`, `continuation?`. Recipe digest identifies the bound preparation instructions/schema. Read-only planning; no model calls or filesystem writes. |
+
+`FormatSelection` is the closed record `{reader:"reference-corpus/1",resources:{"AGENTS.md":Hash,"CORPUS.json":Hash,"FORMAT.md":Hash}}`.
+All three exact paths and hashes are required. `FORMAT.md` is the complete common
+report contract, `AGENTS.md` is instance policy, and `CORPUS.json` is strict
+`reference-corpus/1` machine vocabulary. No linked resource supplies missing
+format meanings. Build compares each selected hash against the exact captured
+Git blob. The index captures all three files as readable contract sources.
 
 `settings` has only positive integer fields `unit_bytes` (4096), `query_bytes`
 (4096), `query_terms` (64), `metadata_bytes` (1048576), `report_bytes` (16777216),
@@ -167,7 +184,8 @@ JobSpec = {schema:"corpus-nav-job/1",job_key:Hash,input_index:IndexRef,
 ```
 
 The initial recipe requires exactly the package's REPORT.json and REPORT.md plus
-captured FORMAT.md context. Sort their identities by raw path. `job_key` hashes
+the three captured governing resources. Sort their identities by raw path.
+`job_key` hashes
 canonical fingerprint, recipe and selected input identities, not itself or physical
 directories. Every call constructs the description with its current selected index
 and card destination; there is no old job manifest to reuse/rebind. A different
@@ -182,7 +200,7 @@ handoff, but the toolkit owns no job-file lifecycle. Lost stdout is retried as a
 read-only operation over the same generation/recipe and current card observations.
 If a required description cannot fit the response cap, return `budget_too_small`;
 never silently materialize a large file instead. Its initial input list carries
-three identities, not source contents or a whole-support inventory.
+five identities, not source contents or a whole-support inventory.
 
 The ordinary preparer reads the selected guidance and originals and writes a
 candidate card to a unique temporary file in the selected fingerprint/recipe
@@ -198,7 +216,8 @@ files are not completions; conflicting same-name bytes are corruption. The card 
 
 Generator is a nonempty reported label or `unknown`. Routing text and anchors are
 nonempty; anchor paths use the corpus-relative base but must belong to this
-package's REPORT.json/REPORT.md inputs. FORMAT is context, not a report anchor.
+package's REPORT.json/REPORT.md inputs. Governing resources supply context, not
+report anchors.
 Fingerprint binds corpus ID, package path/tree and governing contract blobs. Build
 recomputes these allowed source/hash relationships; it needs no original job file.
 Structural admission does not establish semantic quality or publication authority.
@@ -215,7 +234,8 @@ Concurrent preparers may duplicate work; inline descriptions do not supply a lea
 The following notation expands types in place; it is not a permissive free-form
 payload. Arrays preserve their stated order. `Count` is an integer in 0..2^63-1.
 `BuildId` is the request's 32 lowercase hex digits. `Metadata` is exactly the
-validated REPORT.json shape in native FORMAT.md. `Operation` is the six CLI names.
+validated REPORT.json shape in the captured common FORMAT.md. `Operation` is the
+six CLI names.
 `SemanticRequest` is the request's closed schema projected by the canonicalization
 algorithm above; no other fields may appear. `Section` and Handle are as defined
 above. No status below establishes applicability or authority.
@@ -226,7 +246,7 @@ Snapshot = {corpus_id:string,object_format:"sha1"|"sha256",commit:Oid,
 HintState = {kind:"disabled"} | {kind:"none_selected"}
           | {kind:"selection",admitted:Count,rejected:Count}
 Coverage = {captured_files:Count,manifest_only_files:Count,hints:HintState}
-Context = {index:IndexRef,snapshot:Snapshot,recipe_sha256:Hash,
+Context = {index:IndexRef,snapshot:Snapshot,format:FormatSelection,recipe_sha256:Hash,
            reader_recipe_sha256:Hash,coverage:Coverage}
 PageEnd = {kind:"complete"}
         | {kind:"more",reason:"page_limit"|"output_budget",continuation:string}
@@ -346,11 +366,17 @@ derived token/docsize integrity and original-source relationships are checked
 before the private connection becomes query-only. Sorting stays in memory and
 extension loading is disabled.
 
-Legacy `reference/1` imposes no new fixed image-size cap. Callers must provision
+For every captured regular blob, the reader recomputes its Git object ID from
+the exact captured bytes under the snapshot's selected SHA-1 or SHA-256 object
+format. This binds the handle's blob field to those bytes. Manifest-only entries
+retain inventory facts without a readable handle; the index does not verify
+uncaptured bytes or prove the complete commit/tree relationship.
+
+This reader imposes no fixed image-size cap. Callers must provision
 memory for captured image bytes, the SQLite image and validation work. Changes in
 reader code/SQLite identity invalidate old cursors through the existing recipe
-binding; old supported IndexRefs and source handles retain their schemas and
-original payload identities.
+binding. Historical IndexRefs and source handles retain their original payload
+identities and require their separately selected qualified reader.
 
 ## Build effect ordering and recovery
 
