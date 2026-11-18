@@ -8,9 +8,16 @@ a moving branch. Review the instructions before enabling them.
 
 Install complete package directories, including supporting references; copying
 only `SKILL.md` can omit required material. Preserve directory names, bytes, and
-supporting files. Do not overwrite locally modified installations. Package
-directories live at the repository root; `authorship-disclosure` is in
-`authorship_disclosure/`.
+supporting files. Do not overwrite locally modified installations.
+
+Standalone package directories live at the repository root;
+`authorship-disclosure` is in `authorship_disclosure/`. A release may also contain
+native multi-skill artifacts at `systems/<name>/runtime/`, with entrypoints under
+their `skills/` directory. Do not let a flat-root scan silently omit these.
+See [structural staging](tools/README.md) for intact or selected-subtree copies.
+Staging does not establish operational resource closure: qualify the selected
+skill's resources and dependencies after relocation before installation. Native
+plugin metadata does not establish a host's support or activate every skill.
 
 | Host | Personal skill directory |
 | --- | --- |
@@ -35,8 +42,15 @@ when it applies. A reference to another skill can acknowledge applicable policy
 without requiring automatic activation. Follow each skill's stated composition
 requirements: `commit-message` uses separately available
 `reader-oriented-explanation` and `clear-writing`; `skill-authorship` uses
-`model-refinement` for conceptual changes. Installing all seven packages covers
-these dependencies.
+`model-refinement` for conceptual changes. Installing the seven standalone
+packages covers these dependencies. Grouped skills state their own additional requirements.
+
+The reference-corpus runtime offers independent `reference-research` and
+`corpus-navigate` skills. Research needs the selected corpus's policy and binding;
+it needs no navigator installation. Navigation also needs its separately installed
+program and an explicit binding to the corpus and operation. Read the complete
+[toolkit overview](systems/reference-corpus/runtime/README.md) before configuring it.
+Skill discovery alone installs neither program dependencies nor project bindings.
 
 ## Contributions and feedback
 

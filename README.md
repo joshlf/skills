@@ -13,3 +13,5 @@ A collection of agent skills for various tasks.
 | skill-authorship | Write reliable and effective agent skills. |
 | reader-oriented-explanation | Choose what information to include in non-fiction prose, taking into account a mental model of the reader. |
 | authorship-disclosure | Maintain accurate AI-authorship disclosures. |
+| reference-research | Research technical questions and maintain reports under a selected corpus's own rules. |
+| corpus-navigate | Find and read original documents from an explicitly selected captured corpus. |
