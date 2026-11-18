@@ -10,9 +10,12 @@ import os
 import re
 from typing import Any
 
+from ._vendor import reference
+
 OPERATIONS = ("doctor", "build", "list", "read", "search", "prepare")
-SECTIONS = ("Summary", "Applicability", "Findings", "Boundaries", "Evidence",
-            "Revalidation")
+SECTIONS = tuple(heading.removeprefix("## ")
+                 for heading in reference.REQUIRED_REPORT_SECTIONS)
+CONTRACT_PATHS = ("AGENTS.md", "CORPUS.json", "FORMAT.md")
 DEFAULT_SETTINGS = dict(unit_bytes=4096, query_bytes=4096, query_terms=64,
                         metadata_bytes=1048576, report_bytes=16777216,
                         capture_bytes=1073741824, support={"mode": "inventory"})
@@ -43,40 +46,10 @@ def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _pairs(pairs: list[tuple[str, Any]]) -> dict:
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError("duplicate JSON key")
-        result[key] = value
-    return result
-
-
-def _constant(value: str) -> None:
-    raise ValueError("nonfinite JSON number")
-
-
-def scalar(value: Any) -> None:
-    if isinstance(value, str):
-        value.encode("utf-8")
-    elif isinstance(value, dict):
-        for key, item in value.items():
-            key.encode("utf-8")
-            scalar(item)
-    elif isinstance(value, list):
-        for item in value:
-            scalar(item)
-    elif isinstance(value, float):
-        canonical(value)
-
-
 def strict_json(data: bytes) -> Any:
     try:
-        result = json.loads(data.decode("utf-8"), object_pairs_hook=_pairs,
-                            parse_constant=_constant)
-        scalar(result)
-        return result
-    except (ValueError, UnicodeError, RecursionError) as exc:
+        return reference.parse_json(data)
+    except reference.ValidationFailure as exc:
         raise NavError("invalid_request", "Invalid scalar UTF-8 JSON.") from exc
 
 
@@ -279,9 +252,12 @@ def parse_request(operation: str, data: bytes) -> dict:
             if not path.isascii():
                 raise NavError("invalid_request", "Structural path must be ASCII.")
             raw_path(encoded_path(path.encode("ascii")))
-        f = record(r["format"], {"reader", "sha256"}, {"reader", "sha256"})
+        f = record(r["format"], {"reader", "resources"}, {"reader", "resources"})
         text(f["reader"])
-        hashed(f["sha256"])
+        resources = record(f["resources"], set(CONTRACT_PATHS), set(CONTRACT_PATHS))
+        for value in resources.values():
+            hashed(value)
+        r["format"] = dict(reader=f["reader"], resources=resources)
         r["recipe"] = enum(r.get("recipe", "source-only/1"),
                            ("source-only/1", "hinted/1"))
         settings = record(r.get("settings", {}), set(DEFAULT_SETTINGS))

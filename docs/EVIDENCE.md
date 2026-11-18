@@ -18,6 +18,31 @@ behavioral report should identify its exact runtime bytes, dependencies, host an
 model conditions, task protocol, outcomes, failures, and uncertainty. Private
 supporting evidence must not be cited as though a public reader can inspect it.
 
+## Maintainer-reported common-corpus qualification
+
+The `reference-corpus/1` runtime has one shared report contract, explicit instance
+vocabulary and optional `corpus-nav-index/2` navigation. The standalone checker
+and its 40 tests ran with isolated, no-site Python 3.10.12. On macOS with
+Python 3.14.8 and Linux with Python 3.12.16, the 84-case integrated suite
+reported 83 passes and one sandbox-related skip. A separate Mac cell tested
+filesystem write denial.
+
+The selected navigation wheel's 13 imported modules matched its source. Installed
+Mac Python 3.14.8 and Linux Python 3.11.18 operations exercised capture, listing,
+search, original-byte reads and same-ID recovery. Mac-created images and saved
+handles also read exactly on Linux Python 3.11 and 3.12. Separate continuation
+checks denied authoring-source access and network; a Mac sandbox additionally
+denied filesystem writes. These are maintainer-reported observations under those
+specific conditions; raw qualification logs and retained historical payloads are
+not distributed here.
+
+The current reader visibly rejects older image envelopes. Owners of old images
+and handles must retain their explicitly selected compatible reader and runtime;
+a new installation or rebuilt image does not preserve that identity. These
+checks establish neither automatic skill activation nor comparative usefulness.
+Authenticated Claude Code and Gemini CLI behavior remains untested for this
+release. Historical discovery observations below retain their original scope.
+
 ## Maintainer-reported discovery check
 
 The initial [public release](https://github.com/joshlf/skills/commit/6a63da89d7240b1083e56991ab3718fbe7862ae7)

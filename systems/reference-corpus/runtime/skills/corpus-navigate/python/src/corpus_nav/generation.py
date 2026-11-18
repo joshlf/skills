@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+import hashlib
 import importlib.metadata
 import json
 import os
@@ -11,12 +12,14 @@ import re
 import sqlite3
 import sys
 
-from . import captured, git_source, publishing, reference_format
-from .response import (NavError, canonical, digest, encoded_path, fits, hashed,
+from . import __version__, captured, git_source, publishing, reference_format
+from .response import (CONTRACT_PATHS, NavError, canonical, digest, encoded_path, fits, hashed,
                        integer, oid, parse_request, raw_path, record, semantic,
                        sha, strict_json, text)
 
-SCHEMA = "corpus-nav-index/1"
+SCHEMA = "corpus-nav-index/2"
+INTERPRETATION = "reference-corpus/1"
+CONTRACT_FILES = tuple(path.encode("ascii") for path in CONTRACT_PATHS)
 TABLES = {
     "manifest": ("data",),
     "reports": ("package", "title", "metadata"),
@@ -47,7 +50,7 @@ def reader_identity() -> str:
     root = Path(__file__).parent
     sources = {p.relative_to(root).as_posix(): sha(p.read_bytes())
                for p in sorted(root.rglob("*.py"))}
-    return digest(dict(distribution="corpus-nav/0.1.0", sources=sources,
+    return digest(dict(distribution="corpus-nav/" + __version__, sources=sources,
                        sqlite=sqlite3.sqlite_version,
                        markdown_it=importlib.metadata.version("markdown-it-py"),
                        tokenizer="unicode61", query="quoted-whitespace-or/1"))
@@ -84,6 +87,7 @@ class Generation:
 
     def context(self) -> dict:
         return dict(index=self.index, snapshot=self.manifest["snapshot"],
+                    format=self.manifest["semantic_request"]["format"],
                     recipe_sha256=self.manifest["recipe_sha256"],
                     reader_recipe_sha256=self.reader_recipe_sha256,
                     coverage=self.manifest["coverage"])
@@ -120,6 +124,8 @@ def _validate(connection: sqlite3.Connection) -> dict:
         raise NavError("index_mismatch", "Missing unique manifest.")
     try:
         manifest = strict_json(rows[0][0].encode("utf-8"))
+        if isinstance(manifest, dict) and isinstance(manifest.get("schema"), str) and manifest["schema"] != SCHEMA:
+            raise NavError("unsupported_format", "Unsupported index format; select its qualified reader explicitly.")
         required = {"schema", "complete", "build_id", "semantic_request", "request_sha256",
                     "snapshot", "recipe_sha256", "build_input_sha256", "coverage",
                     "report_count", "builder", "contracts"}
@@ -131,6 +137,8 @@ def _validate(connection: sqlite3.Connection) -> dict:
             raise ValueError("invalid manifest")
         request = parse_request("build", canonical({**manifest["semantic_request"],
                                                      "build_id": manifest["build_id"]}))
+        if request["format"]["reader"] != INTERPRETATION:
+            raise ValueError("unsupported captured interpretation")
         if semantic(request) != manifest["semantic_request"]:
             raise ValueError("noncanonical stored request")
         snapshot = record(manifest["snapshot"],
@@ -173,7 +181,7 @@ def _validate(connection: sqlite3.Connection) -> dict:
                 raise ValueError("source package relationship mismatch")
             if package is not None and package not in packages:
                 raise ValueError("source has no owning report")
-            expected_role = ("contract" if row["path"] in (b"AGENTS.md", b"FORMAT.md")
+            expected_role = ("contract" if row["path"] in CONTRACT_FILES
                              else "metadata" if package is not None and parts[2:] == [b"REPORT.json"]
                              else "prose" if package is not None and parts[2:] == [b"REPORT.md"]
                              else "support")
@@ -188,6 +196,12 @@ def _validate(connection: sqlite3.Connection) -> dict:
                         or row["reason"] is not None
                         or row["package"] is None and row["role"] != "contract"):
                     raise ValueError("invalid captured source state")
+                # A source handle's Git blob identity names these exact bytes.
+                blob_hash = hashlib.new(snapshot["object_format"])
+                blob_hash.update(f"blob {len(row['data'])}\0".encode("ascii"))
+                blob_hash.update(row["data"])
+                if blob_hash.hexdigest() != row["oid"]:
+                    raise ValueError("captured Git blob identity mismatch")
                 row["data"].decode("utf-8")
             elif row["hash"] is not None or not row["reason"]:
                 raise ValueError("invalid manifest-only source state")
@@ -197,10 +211,13 @@ def _validate(connection: sqlite3.Connection) -> dict:
             raise ValueError("build input mismatch")
         contracts = {r["path"].decode("ascii"): r["hash"] for r in connection.execute(
             "SELECT path,hash FROM sources WHERE role='contract'")}
-        if (set(contracts) != {"AGENTS.md", "FORMAT.md"}
+        if (set(contracts) != set(CONTRACT_PATHS)
                 or contracts != manifest["contracts"]
-                or contracts["FORMAT.md"] != request["format"]["sha256"]):
+                or contracts != request["format"]["resources"]):
             raise ValueError("contract capture mismatch")
+        policy_bytes = connection.execute(
+            "SELECT data FROM sources WHERE path=?", (b"CORPUS.json",)).fetchone()[0]
+        policy = reference_format.policy(policy_bytes)
         expected_subjects, expected_coordinates, expected_topics = [], [], []
         for report in connection.execute("SELECT * FROM reports"):
             package = report["package"]
@@ -211,7 +228,7 @@ def _validate(connection: sqlite3.Connection) -> dict:
                 "SELECT * FROM sources WHERE path IN (?,?)",
                 (base + b"REPORT.json", base + b"REPORT.md"))}
             meta = reference_format.metadata(sources[base + b"REPORT.json"]["data"],
-                                             base + b"REPORT.json")
+                                             base + b"REPORT.json", policy)
             title, sections, _ = reference_format.prose(sources[base + b"REPORT.md"]["data"],
                                                         base + b"REPORT.md")
             if canonical(meta).decode("ascii") != report["metadata"] or title != report["title"]:
@@ -265,7 +282,11 @@ def _validate(connection: sqlite3.Connection) -> dict:
         if connection.execute("SELECT count(*) FROM source_fts").fetchone()[0] != count:
             raise ValueError("unrelated search rows")
         return manifest
-    except (ValueError, TypeError, KeyError, AttributeError, UnicodeError, NavError) as exc:
+    except NavError as exc:
+        if exc.code == "unsupported_format":
+            raise
+        raise NavError("index_mismatch", "Invalid complete index manifest or relations.") from exc
+    except (ValueError, TypeError, KeyError, AttributeError, UnicodeError) as exc:
         raise NavError("index_mismatch", "Invalid complete index manifest or relations.") from exc
 
 
@@ -286,7 +307,7 @@ def _capture(request: dict, snapshot: dict, entries: list[git_source.Entry], con
     by_path = {e.path: e for e in entries}
     # Navigation selects governing context and reports. The native publication
     # validator separately owns the complete authoring candidate's root shape.
-    required_files = [b"AGENTS.md", b"FORMAT.md"]
+    required_files = list(CONTRACT_FILES)
     packages = []
     if b"reports" in by_path:
         if by_path[b"reports"].kind != "tree":
@@ -319,8 +340,10 @@ def _capture(request: dict, snapshot: dict, entries: list[git_source.Entry], con
         if total > request["settings"]["capture_bytes"]:
             raise NavError("invalid_report", "Required capture exceeds selected limit.")
         captured[path] = data
-    if sha(captured[b"FORMAT.md"]) != request["format"]["sha256"]:
-        raise NavError("unsupported_format", "Pinned FORMAT.md hash differs.")
+    for path in CONTRACT_PATHS:
+        if sha(captured[path.encode("ascii")]) != request["format"]["resources"][path]:
+            raise NavError("unsupported_format", "Pinned interpretation resource hash differs.")
+    policy = reference_format.policy(captured[b"CORPUS.json"])
     for entry in entries:
         if entry.kind == "tree":
             continue
@@ -328,7 +351,7 @@ def _capture(request: dict, snapshot: dict, entries: list[git_source.Entry], con
         package = parts[1].decode("ascii") if len(parts) > 2 and parts[0] == b"reports" else None
         role = ("metadata" if entry.path in required and entry.path.endswith(b"REPORT.json")
                 else "prose" if entry.path in required and entry.path.endswith(b"REPORT.md")
-                else "contract" if entry.path in (b"AGENTS.md", b"FORMAT.md")
+                else "contract" if entry.path in CONTRACT_FILES
                 else "support")
         data = captured.get(entry.path)
         reason = "inventory_only"
@@ -354,7 +377,7 @@ def _capture(request: dict, snapshot: dict, entries: list[git_source.Entry], con
                             data, reason if data is None else None))
     for package in sorted(packages):
         base = b"reports/" + package.encode("ascii") + b"/"
-        meta = reference_format.metadata(captured[base + b"REPORT.json"], base + b"REPORT.json")
+        meta = reference_format.metadata(captured[base + b"REPORT.json"], base + b"REPORT.json", policy)
         data = captured[base + b"REPORT.md"]
         title, sections, blocks = reference_format.prose(data, base + b"REPORT.md")
         connection.execute("INSERT INTO reports VALUES(?,?,?)", (package, title, canonical(meta).decode("ascii")))
@@ -390,12 +413,13 @@ def _result(request: dict, generation: Generation, residue: list[str]) -> dict:
 
 
 def _preflight(request: dict, reservation: Path, staging: Path) -> None:
-    if request["format"]["reader"] != "reference/1":
+    if request["format"]["reader"] != INTERPRETATION:
         raise NavError("unsupported_format", "Unsupported selected reader.")
     if request["card_selections"]:
         raise NavError("unsupported_capability", "Card admission is not implemented in this source-only preview.")
     n = 2**63 - 1
     fake = dict(index=dict(path=str(reservation / ("f" * 64 + ".sqlite")), sha256="f" * 64),
+                format=request["format"],
                 snapshot=dict(corpus_id=request["corpus_id"], object_format="sha256", commit="f" * 64,
                               tree="f" * 64, corpus_path=request["corpus_path"]),
                 recipe_sha256="f" * 64, reader_recipe_sha256="f" * 64,
