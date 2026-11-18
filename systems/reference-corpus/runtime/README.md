@@ -7,6 +7,10 @@ This package contains two independently useful skills:
 | `reference-research` | Plan research and maintain reports under the common report contract. | An explicit binding to the corpus's local policy, vocabulary and maintenance resources. |
 | `corpus-navigate` | Find and read original reports from an immutable captured index. | A separately installed selected executable and an explicit interpretation/source/index binding. |
 
+The [getting-started guide](GETTING-STARTED.md) walks through creating a corpus,
+running its maintenance checks, and installing and using the optional navigator.
+It includes the required starting files and needs no general authoring handbook.
+
 The complete skill directories are under `skills/`. Each skill resolves its
 supporting references from its own `SKILL.md` directory. Copy the entire selected
 directory when using a host's ordinary skill-directory route. Installing the
@@ -30,9 +34,9 @@ The navigation skill contains an ordinary Python source project under
 `skills/corpus-navigate/python/`. Install it separately in a selected environment
 and read the [`corpus-nav` contract](skills/corpus-navigate/references/cli.md).
 It interprets `reference-corpus/1` and captures the exact selected policy, full
-report contract and machine vocabulary. The navigator requires Python 3.11+ with
-SQLite serialize/deserialize and FTS5. Index validation does not replace candidate
-validation or semantic review of report claims.
+report contract and machine vocabulary. The navigator requires Git 2.45+ and
+Python 3.11+ with SQLite serialize/deserialize and FTS5. Index validation does not
+replace candidate validation or semantic review of report claims.
 The current program supports source capture, inventory, search and original-byte
 reads. Preparation and nonempty card selections remain unsupported.
 

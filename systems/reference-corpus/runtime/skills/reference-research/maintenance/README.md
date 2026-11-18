@@ -6,6 +6,16 @@ Python 3.10+ standard-library checker and tests are `reference.py` and
 not from the working directory. The tests expect their native projection below;
 stage that projection before running them.
 
+The candidate also needs ordinary UTF-8 files at `AGENTS.md`, `FORMAT.md`,
+`README.md`, and `CORPUS.json`, plus the selected validator and tests below.
+`README.md` is the required human introduction. The project supplies its policy
+and binding in `AGENTS.md` and `CORPUS.md`, adopts the full common format, and
+selects its topic vocabulary in `CORPUS.json`. Generate `CATALOG.json` with the
+candidate's `catalog` command, including for an empty collection; `check` requires
+that generated catalog to be current. Add report packages under `reports/` when
+present. Research also requires the complete selected skill and binding even
+though the standalone checker does not validate their presence or meaning.
+
 A complete native maintenance materialization contains the whole selected
 `reference-research/` skill at `skills/reference-research/`, plus these exact
 copies from that leaf:
