@@ -8,7 +8,7 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 from ._vendor import reference
-from .response import NavError, SECTIONS, strict_json
+from .response import NavError, SECTIONS
 
 
 @dataclass(frozen=True)
@@ -25,12 +25,19 @@ def utf8(data: bytes) -> str:
         raise NavError("invalid_report", "Required source is not UTF-8.") from exc
 
 
-def metadata(data: bytes, path: bytes) -> dict:
+def policy(data: bytes) -> reference.CorpusPolicy:
     try:
-        value = strict_json(data)
-    except NavError as exc:
+        return reference.parse_policy(data)
+    except reference.ValidationFailure as exc:
+        raise NavError("invalid_report", "Invalid corpus machine policy.") from exc
+
+
+def metadata(data: bytes, path: bytes, policy: reference.CorpusPolicy) -> dict:
+    try:
+        value = reference.parse_json(data)
+    except reference.ValidationFailure as exc:
         raise NavError("invalid_report", "Invalid report JSON.") from exc
-    problems = reference._validate_metadata(value, Path(path.decode("ascii")))
+    problems = reference.validate_metadata(value, policy, Path(path.decode("ascii")))
     if problems:
         raise NavError("invalid_report", problems[0].message)
     return value
@@ -38,7 +45,7 @@ def metadata(data: bytes, path: bytes) -> dict:
 
 def prose(data: bytes, path: bytes) -> tuple[str, list[Section], list[tuple[int, int]]]:
     text = utf8(data)
-    problems = reference._validate_prose(text, Path(path.decode("ascii")))
+    problems = reference.validate_prose(text, Path(path.decode("ascii")))
     if problems:
         raise NavError("invalid_report", problems[0].message)
     lines = data.splitlines(keepends=True)

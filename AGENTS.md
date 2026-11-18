@@ -46,10 +46,16 @@ requirements: `commit-message` uses separately available
 packages covers these dependencies. Grouped skills state their own additional requirements.
 
 The reference-corpus runtime offers independent `reference-research` and
-`corpus-navigate` skills. Research needs the selected corpus's policy and binding;
-it needs no navigator installation. Navigation also needs its separately installed
-program and an explicit binding to the corpus and operation. Read the complete
-[toolkit overview](systems/reference-corpus/runtime/README.md) before configuring it.
+`corpus-navigate` skills. Research adopts the complete `reference-corpus/1`
+report contract and needs an explicit corpus binding, local action policy and
+topic vocabulary in `CORPUS.json`.
+Its complete leaf includes standalone standard-library maintenance sources and
+generic starters; it needs no navigator installation. Retain a pinned complete
+local copy when offline interpretation or maintenance is required. Navigation
+also needs its separately installed program and an explicit source/index/operation
+binding. The current `corpus-nav-index/2` captures the complete policy, format and
+vocabulary; older images require their separately selected compatible readers.
+Read the complete [toolkit overview](systems/reference-corpus/runtime/README.md) before configuring it.
 Skill discovery alone installs neither program dependencies nor project bindings.
 
 ## Contributions and feedback
