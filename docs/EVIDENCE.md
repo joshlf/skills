@@ -4,10 +4,12 @@ These packages are instruction artifacts, not guarantees that an agent will
 follow them or produce a correct result. Host configuration, model behavior,
 context, tools, and task scope affect outcomes.
 
-Public CI checks package structure, supporting local links, and the expected
-seven-package composition. Those checks do not measure writing quality,
-refinement success, coding reliability, privacy, or skill activation. A source
-reference records provenance or rationale; it is not an independent evaluation.
+Public CI checks the seven standalone packages, any grouped runtime artifacts
+present in the release, and supporting local links. Exact source comparison
+separately checks that a selected artifact was not omitted. Those checks do not
+measure writing quality, refinement success, coding reliability, privacy, or skill
+activation. A source reference records provenance or rationale; it is not an
+independent evaluation.
 
 This distribution includes no raw behavioral campaign, held-out result, or claim
 that these versions outperform alternatives. Historical evaluations are not
@@ -39,14 +41,25 @@ silently apply to later changed files or host versions.
 
 ## Reproduce discovery
 
-The [native discovery probe](../tests/probe_hosts.py) can be run from a clean
-installation with the official `codex`, `claude`, and `gemini` executables on
-PATH. It creates a temporary project, copies the complete packages, and uses
-local listing or SDK initialization APIs without sending a user/model turn:
+The [native discovery probe](../tests/probe_hosts.py) uses the official `codex`,
+`claude`, and `gemini` executables on PATH. It also requires a separately verified
+complete release inventory and a reviewed `skill_packages.py` outside the tested
+snapshot. Its Python environment needs the packaging dependencies pinned in
+`tools/requirements.txt`.
 
 ```sh
-python3 -I -B tests/probe_hosts.py --snapshot . --output /absolute/new/results
+/abs/packaging-env/bin/python -I -B tests/probe_hosts.py \
+  --snapshot /abs/release \
+  --expected-inventory /abs/verified-inventory.json \
+  --tooling /abs/reviewed-tooling/skill_packages.py \
+  --output /abs/new/results
 ```
+
+The inventory has `inventory` and `content_sha256` fields produced from the
+separately checked complete selection. Deriving it only from the tested snapshot
+would not independently detect a whole artifact omitted from that snapshot. The
+probe creates a temporary project, copies complete selected skill directories,
+and uses local listing or SDK initialization APIs without sending a model turn.
 
 The probe reports actual host versions and binds the result to a complete
 path/byte/mode inventory digest. It tests discovery, not instruction following,
