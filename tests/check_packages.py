@@ -18,7 +18,8 @@ PACKAGES = {'clear-writing': 'clear-writing', 'commit-message': 'commit-message'
             'reader-oriented-explanation': 'reader-oriented-explanation',
             'authorship_disclosure': 'authorship-disclosure',
             'research-wheel': 'research-wheel',
-            'swarm-model-refinement': 'swarm-model-refinement'}
+            'swarm-model-refinement': 'swarm-model-refinement',
+            'architectural-design': 'architectural-design'}
 
 
 def require(condition, message):

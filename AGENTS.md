@@ -51,8 +51,13 @@ without launching a refinement swarm when unavailable), uses Python 3.8+ standar
 library for its optional `scripts/holdout-seal.py` helper when file-based
 sealing is supported, and optionally composes with separately installed packages
 such as `skill-authorship` or `reference-research` without requiring unselected
-packages. Installing the nine standalone packages covers the standalone
-dependencies. Grouped skills state their own additional requirements.
+packages; `architectural-design` is instruction-only and operates standalone,
+optionally composing through public interfaces with `model-refinement`,
+`swarm-model-refinement`, `research-wheel`, `corpus-navigate`,
+`reference-research`, `robust-code`, `reader-oriented-explanation`, and
+`clear-writing` without requiring unselected packages. Installing the ten
+standalone packages covers the standalone dependencies. Grouped skills state their
+own additional requirements.
 
 The reference-corpus runtime offers independent `reference-research` and
 `corpus-navigate` skills. Research adopts the complete `reference-corpus/1`
