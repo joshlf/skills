@@ -46,7 +46,12 @@ requirements: `commit-message` uses separately available
 optionally composes with `reference-research`, `corpus-navigate`,
 `model-refinement`, or separately installed coordination, efficiency,
 supervision, or domain skills when present without requiring unselected
-packages. Installing the eight standalone packages covers the standalone
+packages; `swarm-model-refinement` requires `model-refinement` (failing closed
+without launching a refinement swarm when unavailable), uses Python 3.8+ standard
+library for its optional `scripts/holdout-seal.py` helper when file-based
+sealing is supported, and optionally composes with separately installed packages
+such as `skill-authorship` or `reference-research` without requiring unselected
+packages. Installing the nine standalone packages covers the standalone
 dependencies. Grouped skills state their own additional requirements.
 
 The reference-corpus runtime offers independent `reference-research` and
