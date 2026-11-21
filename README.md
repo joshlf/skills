@@ -15,5 +15,6 @@ A collection of agent skills for various tasks.
 | authorship-disclosure | Maintain accurate AI-authorship disclosures. |
 | research-wheel | Build an ever-growing body of research on a topic, using findings to inspire further research. |
 | swarm-model-refinement | Coordinate multi-agent conceptual model refinement using isolated contexts, adversarial falsification, and optional blind holdout confirmation. |
+| architectural-design | Specify system, subsystem, protocol, schema, or framework architectures before implementation by separating target ground from foils, co-designing outcome contracts, probing decision-blocking premises, and projecting timeless specs or RFCs. |
 | reference-research | Research technical questions and maintain precise reports under a shared report standard and local corpus policy. |
 | corpus-navigate | Find and read original documents from an explicitly selected captured corpus. |
