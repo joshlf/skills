@@ -4,7 +4,7 @@ These packages are instruction artifacts, not guarantees that an agent will
 follow them or produce a correct result. Host configuration, model behavior,
 context, tools, and task scope affect outcomes.
 
-Public CI checks the seven standalone packages, any grouped runtime artifacts
+Public CI checks the eight standalone packages, any grouped runtime artifacts
 present in the release, and supporting local links. Exact source comparison
 separately checks that a selected artifact was not omitted. Those checks do not
 measure writing quality, refinement success, coding reliability, privacy, or skill
