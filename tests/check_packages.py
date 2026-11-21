@@ -16,7 +16,8 @@ PACKAGES = {'clear-writing': 'clear-writing', 'commit-message': 'commit-message'
             'model-refinement': 'model-refinement', 'robust-code': 'robust-code',
             'skill-authorship': 'skill-authorship',
             'reader-oriented-explanation': 'reader-oriented-explanation',
-            'authorship_disclosure': 'authorship-disclosure'}
+            'authorship_disclosure': 'authorship-disclosure',
+            'research-wheel': 'research-wheel'}
 
 
 def require(condition, message):

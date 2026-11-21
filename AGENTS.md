@@ -42,8 +42,12 @@ when it applies. A reference to another skill can acknowledge applicable policy
 without requiring automatic activation. Follow each skill's stated composition
 requirements: `commit-message` uses separately available
 `reader-oriented-explanation` and `clear-writing`; `skill-authorship` uses
-`model-refinement` for conceptual changes. Installing the seven standalone
-packages covers these dependencies. Grouped skills state their own additional requirements.
+`model-refinement` for conceptual changes; `research-wheel` runs standalone and
+optionally composes with `reference-research`, `corpus-navigate`,
+`model-refinement`, or separately installed coordination, efficiency,
+supervision, or domain skills when present without requiring unselected
+packages. Installing the eight standalone packages covers the standalone
+dependencies. Grouped skills state their own additional requirements.
 
 The reference-corpus runtime offers independent `reference-research` and
 `corpus-navigate` skills. Research adopts the complete `reference-corpus/1`
